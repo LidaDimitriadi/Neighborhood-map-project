@@ -15,10 +15,17 @@
 				<div class="searchBar col-md-4 col-xs-12">
 					<form>
 						<label for="search">Search restaurants</label>
-						<input id="search" class="form-control" placeholder="Search"></input>
+						<input id="search" class="form-control" placeholder="Search" data-bind="textInput: searchStr, 
+						event: { 
+					        keyup: function(event) { search(); }
+					    }"/>
 					</form>
-					<!--<ul data-bind="enable: restaurantList">
-						<li data-bind="text: name"></li>-->
+					<ul data-bind="enable: RestaurantsList, foreach: RestaurantsList">
+						<li class="restaurant">
+							Name: <span data-bind="text: name"></span><br>
+							Rating: <span data-bind="text: rating"></span><br>
+							Address: <span data-bind="text: address"></span><br>
+						</li>
 					</ul>
 				</div>
 				<div class="map col-md-8 col-xs-12" id="map">
@@ -29,7 +36,7 @@
 		</div>
 		<script src="bower_components/jquery/dist/jquery.min.js"></script>
 		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
-		<script src="bower_components/knockout/knockout.js"></script>
+		<script src="bower_components/knockout/dist/knockout.js"></script>
 		<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBS025Zl1N-CLVM05-O0_vVO-4heTIpP38&libraries=places"></script>
 		<script src="js/app.js"></script>
 	</body>

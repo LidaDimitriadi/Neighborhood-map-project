@@ -12,6 +12,18 @@ ul {
 
 
 
+.restaurant {
+	font-weight: bold;
+	font-size: 14px;
+	padding: 10px;
+}
+
+span {
+	font-weight: normal;
+	font-size: 14px;
+}
+
+
 .map {
 	height: 500px;
 	padding: 20px;
