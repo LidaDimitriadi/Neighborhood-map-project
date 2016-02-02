@@ -1,9 +1,11 @@
 //Restaurant object
 
-var Restaurant = function(name, vicinity, rating) {
+var Restaurant = function(name, vicinity, rating, currentMap, markerLocation) {
 	this.name = name;
 	this.address = vicinity;
 	this.rating = rating;
+	this.map = currentMap;
+	this.marker = markerLocation;
 }
 
 
@@ -12,12 +14,17 @@ var Restaurant = function(name, vicinity, rating) {
 var ViewModelMapApp = function() {
 	var self = this;
 	this.searchStr  = ko.observable("");
-
-	//the initial display restaurants list
-	self.initialRestaurants = ko.observableArray();
 	//the current restaurant list according to search results
 	self.RestaurantsList = ko.observableArray();
 	self.removedRestaurants = [];
+	self.markers = [];
+
+	self.setMapOnAll = function(map) {
+	  for (var i = 0; i < self.markers.length; i++) {
+	    self.markers[i].setMap(map);
+	  }
+	}
+
 	//Init map, markers and initialRestaurants
 	this.initMap = function() {
 		// Create a map object and specify the DOM element for display.
@@ -51,28 +58,33 @@ var ViewModelMapApp = function() {
 				   	}
 			   	   	else {
 				    	place.rating = place.rating.toString();
-				   	}	
-			   		//create new Restaurant and add it to my list of restaurants
-				    self.initialRestaurants.push( new Restaurant(place.name, place.vicinity, place.rating) );
-				    self.RestaurantsList.push( new Restaurant(place.name, place.vicinity, place.rating) );
-				    //create markers
+				   	}
+
+				   	//create markers and add them to an array for manipulation
+				   	var markers = [];
 				    var marker = new google.maps.Marker({
 					    map: map,
 				     	position: place.geometry.location
 					});
+					self.markers.push(marker);
+
+			   		//create new Restaurant and add it to my list of restaurants
+				    self.RestaurantsList.push( new Restaurant(place.name, place.vicinity, place.rating, map, marker.position) );
+
 				}
-				//for(i in self.initialRestaurants()) {
-				//	console.log(self.initialRestaurants()[i].name);
-				//}
 			}
 		});
+		
 	};	
 
 	//search through initialRestaurants function using the updated searchStr
 
+
 	this.search = function() {
 		console.log("searching!!");
-		//console.log(self.searchStr());
+		//clears the markers from map
+		//Hide all markers from map
+		self.setMapOnAll(null);
 		//check first if the name exists in the current restaurant list
 		//if not remove the elements
 		for (var i=0; i<self.RestaurantsList().length; i++) {
@@ -81,13 +93,11 @@ var ViewModelMapApp = function() {
 				console.log(self.RestaurantsList()[i].name.indexOf(self.searchStr()));
 				console.log("removed " + self.RestaurantsList()[i].name);
 				self.restaurant = self.RestaurantsList()[i];
-				self.removedRestaurants.push( new Restaurant(self.RestaurantsList()[i].name,self.RestaurantsList()[i].vicinity, self.RestaurantsList()[i].rating) );
-				var place = self.removedRestaurants.length - 1;
-				console.log("pushed to removed " + self.removedRestaurants[place].name);
-				console.log("putting it in place " + place);
+				self.removedRestaurants.push( new Restaurant(self.RestaurantsList()[i].name,self.RestaurantsList()[i].vicinity, self.RestaurantsList()[i].rating, self.RestaurantsList()[i].map, self.RestaurantsList()[i].marker) );
 				self.RestaurantsList().splice(i, 1);
 				i--;
 				console.log(i);
+				console.log("RestaurantsList length is " + self.RestaurantsList().length);
 			}
 			console.log(self.RestaurantsList().length);
 		}
@@ -101,15 +111,17 @@ var ViewModelMapApp = function() {
 				console.log("found restaurant in the removed");
 				console.log("restaurant name is " + self.removedRestaurants[j].name);
 				console.log("RestaurantsList length before is " + self.RestaurantsList().length);
-				self.RestaurantsList().push( new Restaurant(self.removedRestaurants[j].name, self.removedRestaurants[j].vicinity, self.removedRestaurants[j].rating) );
+				self.RestaurantsList().push( new Restaurant(self.removedRestaurants[j].name, self.removedRestaurants[j].vicinity, self.removedRestaurants[j].rating, self.removedRestaurants[j].map, self.removedRestaurants[j].marker) );
 				self.removedRestaurants.splice(j, 1);
 				console.log("RestaurantsList length after is " + self.RestaurantsList().length);
 				j--;
 			}
 		}
 
+		//Make the corresponding markers visible
 		for (i in self.RestaurantsList()) {
 			console.log(self.RestaurantsList()[i].name);
+			self.markers[i].setMap(self.RestaurantsList()[i].map);
 		}
 		console.log("length is " + self.RestaurantsList().length);
 	}
