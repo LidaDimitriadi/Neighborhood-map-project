@@ -81,49 +81,38 @@ var ViewModelMapApp = function() {
 
 
 	this.search = function() {
-		console.log("searching!!");
-		//clears the markers from map
 		//Hide all markers from map
 		self.setMapOnAll(null);
+		var str, strRestaurant;
+		str = self.searchStr().toLowerCase();
 		//check first if the name exists in the current restaurant list
 		//if not remove the elements
 		for (var i=0; i<self.RestaurantsList().length; i++) {
-			console.log(self.RestaurantsList()[i].name, self.searchStr());
-			if (self.RestaurantsList()[i].name.indexOf(self.searchStr()) == -1) {
-				console.log(self.RestaurantsList()[i].name.indexOf(self.searchStr()));
-				console.log("removed " + self.RestaurantsList()[i].name);
+			strRestaurant = self.RestaurantsList()[i].name.toLowerCase();
+			if (strRestaurant.indexOf(str) == -1) {
 				self.restaurant = self.RestaurantsList()[i];
 				self.removedRestaurants.push( new Restaurant(self.RestaurantsList()[i].name,self.RestaurantsList()[i].vicinity, self.RestaurantsList()[i].rating, self.RestaurantsList()[i].map, self.RestaurantsList()[i].marker) );
-				self.RestaurantsList().splice(i, 1);
+				self.RestaurantsList.splice(i, 1);
 				i--;
-				console.log(i);
-				console.log("RestaurantsList length is " + self.RestaurantsList().length);
 			}
-			console.log(self.RestaurantsList().length);
 		}
+		
 		//or if the subString is found on the initial Restaurants list
 		//add the restaurant again to the current list
 		//and remove it from the removedRestaurants list
 		for (var j=0; j<self.removedRestaurants.length; j++) {
-			console.log("j is " + j);
-			console.log("started search in the removed");
-			if (self.removedRestaurants[j].name.indexOf(self.searchStr()) > -1) {
-				console.log("found restaurant in the removed");
-				console.log("restaurant name is " + self.removedRestaurants[j].name);
-				console.log("RestaurantsList length before is " + self.RestaurantsList().length);
-				self.RestaurantsList().push( new Restaurant(self.removedRestaurants[j].name, self.removedRestaurants[j].vicinity, self.removedRestaurants[j].rating, self.removedRestaurants[j].map, self.removedRestaurants[j].marker) );
+			strRestaurant = self.removedRestaurants[j].name.toLowerCase();
+			if (strRestaurant.indexOf(str) > -1) {
+				self.RestaurantsList.push( new Restaurant(self.removedRestaurants[j].name, self.removedRestaurants[j].vicinity, self.removedRestaurants[j].rating, self.removedRestaurants[j].map, self.removedRestaurants[j].marker) );
 				self.removedRestaurants.splice(j, 1);
-				console.log("RestaurantsList length after is " + self.RestaurantsList().length);
 				j--;
 			}
 		}
 
 		//Make the corresponding markers visible
 		for (i in self.RestaurantsList()) {
-			console.log(self.RestaurantsList()[i].name);
 			self.markers[i].setMap(self.RestaurantsList()[i].map);
 		}
-		console.log("length is " + self.RestaurantsList().length);
 	}
 	
 	google.maps.event.addDomListener(window, 'load', this.initMap);
