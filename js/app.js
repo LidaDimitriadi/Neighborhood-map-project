@@ -68,8 +68,31 @@ var ViewModelMapApp = function() {
 					});
 					self.markers.push(marker);
 
+
+
 			   		//create new Restaurant and add it to my list of restaurants
 				    self.RestaurantsList.push( new Restaurant(place.name, place.vicinity, place.rating, map, marker.position) );
+
+				    //display streetview thumbnail when user hovers on marker
+				    (function (i) {
+						google.maps.event.addListener(self.markers[i], 'mouseover', function() {
+							console.log(self.markers[i].position.lng());
+							var contentStr = '<h5><strong>' + self.RestaurantsList()[i].name + '</strong></h5>' + 
+										  '<div id="infoWindowStreetview"><img src="https://maps.googleapis.com/maps/api/streetview?size=200x200&location=' + self.RestaurantsList()[i].marker.lat() + ',' + self.RestaurantsList()[i].marker.lng() + '&heading=151.78&pitch=-0.76&key=AIzaSyBS025Zl1N-CLVM05-O0_vVO-4heTIpP38"></div>';
+								
+										  console.log(contentStr);
+							var infowindow = new google.maps.InfoWindow({
+							    	content: contentStr
+							  	});
+
+							infowindow.open(map, self.markers[i]);
+							console.log("still ok");
+							//close infoWindow on mouseout
+							google.maps.event.addListener(self.markers[i], 'mouseout', function() {
+								infowindow.close();
+							});
+						});
+					})(i);
 
 				}
 			}
@@ -91,7 +114,7 @@ var ViewModelMapApp = function() {
 			strRestaurant = self.RestaurantsList()[i].name.toLowerCase();
 			if (strRestaurant.indexOf(str) == -1) {
 				self.restaurant = self.RestaurantsList()[i];
-				self.removedRestaurants.push( new Restaurant(self.RestaurantsList()[i].name,self.RestaurantsList()[i].vicinity, self.RestaurantsList()[i].rating, self.RestaurantsList()[i].map, self.RestaurantsList()[i].marker) );
+				self.removedRestaurants.push(self.restaurant);
 				self.RestaurantsList.splice(i, 1);
 				i--;
 			}
@@ -103,7 +126,8 @@ var ViewModelMapApp = function() {
 		for (var j=0; j<self.removedRestaurants.length; j++) {
 			strRestaurant = self.removedRestaurants[j].name.toLowerCase();
 			if (strRestaurant.indexOf(str) > -1) {
-				self.RestaurantsList.push( new Restaurant(self.removedRestaurants[j].name, self.removedRestaurants[j].vicinity, self.removedRestaurants[j].rating, self.removedRestaurants[j].map, self.removedRestaurants[j].marker) );
+				self.restaurant = self.removedRestaurants[j];
+				self.RestaurantsList.push(self.restaurant);
 				self.removedRestaurants.splice(j, 1);
 				j--;
 			}
@@ -116,6 +140,11 @@ var ViewModelMapApp = function() {
 	}
 	
 	google.maps.event.addDomListener(window, 'load', this.initMap);
+
+	//display streetview thumbnail when user hovers on marker
+
 }
+
+
 
 ko.applyBindings(new ViewModelMapApp());
