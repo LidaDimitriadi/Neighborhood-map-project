@@ -11,8 +11,15 @@
 		<div class="container-fluid">
 			<header class="row"><h1 class="text-center col-md-12 col-xs-12">My Neighborhood map App</h1></header>
 			<section class="row">
-				<h2 class="col-md-12 col-xs-12">Restaurants in historical center - Athens</h2>
+				<h2 class="col-md-12 col-xs-12">Type a city to search restaurants</h2>
 				<div class="searchBar col-md-4 col-xs-12">
+					<form data-bind="submit: initMap">
+				       <label for="city">City: </label><input type="text" id="city" class="form-control" value="">
+				       <button class="btn btn-default">Submit</button>
+				    </form>
+				</div>
+				<h2 class="col-md-12 col-xs-12">Restaurants in historical center - Athens</h2>
+				<div class="searchBar col-md-4 col-xs-12" data-bind="css: {disabled:  checkEnable() == false }">
 					<form>
 						<label for="search">Search restaurants</label>
 						<input id="search" class="form-control" placeholder="Search" data-bind="textInput: searchStr, 
