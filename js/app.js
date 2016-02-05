@@ -86,7 +86,6 @@ var ViewModelMapApp = function() {
 							  	});
 
 							infowindow.open(map, self.markers[i]);
-							console.log("still ok");
 							//close infoWindow on mouseout
 							google.maps.event.addListener(self.markers[i], 'mouseout', function() {
 								infowindow.close();
@@ -148,3 +147,12 @@ var ViewModelMapApp = function() {
 
 
 ko.applyBindings(new ViewModelMapApp());
+
+var city = "Paris";
+var APIstr = "https://maps.googleapis.com/maps/api/geocode/json?address=Paris&key=AIzaSyBS025Zl1N-CLVM05-O0_vVO-4heTIpP38";
+
+$.getJSON(APIstr, function(data) {
+	console.log(data.results[0].geometry.location.lat);
+}).error(function() {
+	console.log("error");
+});
