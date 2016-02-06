@@ -13,18 +13,13 @@ var Restaurant = function(name, vicinity, rating, currentMap, markerLocation) {
 
 var ViewModelMapApp = function() {
 	var self = this;
-	this.searchStr  = ko.observable("");
+	self.searchStr  = ko.observable("");
 	//the current restaurant list according to search results
 	self.RestaurantsList = ko.observableArray();
 	self.removedRestaurants = [];
 	self.markers = [];
-	self.cityExists = false;
-
-	self.checkEnable = function() {
-		return self.cityExists;
-	}
-
-	console.log(self.cityExists);
+	self.cityExists = ko.observable(false);
+	self.city = "";
 	self.setMapOnAll = function(map) {
 	  for (var i = 0; i < self.markers.length; i++) {
 	    self.markers[i].setMap(map);
@@ -32,10 +27,10 @@ var ViewModelMapApp = function() {
 	}
 
 	//Init map, markers and initialRestaurants
-	this.initMap = function() {
+	self.initMap = function() {
 		//use the city that the user provides
-		var city = $("#city").val();
-		var APIstr = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + city + '&key=AIzaSyBS025Zl1N-CLVM05-O0_vVO-4heTIpP38';
+		self.city = $("#city").val();
+		var APIstr = 'https://maps.googleapis.com/maps/api/geocode/json?address=' + self.city + '&key=AIzaSyBS025Zl1N-CLVM05-O0_vVO-4heTIpP38';
 		var lat, lng;
 
 		//initialize all arrays and values
@@ -48,7 +43,7 @@ var ViewModelMapApp = function() {
 		$.getJSON(APIstr).done(function(data) {
 			lat = data.results[0].geometry.location.lat;
 			lng = data.results[0].geometry.location.lng;
-			self.cityExists = true;
+			self.cityExists(true);
 			var loc = new google.maps.LatLng(lat, lng);
 			var map = new google.maps.Map(document.getElementById('map'), {
 			  center: loc,
@@ -56,7 +51,6 @@ var ViewModelMapApp = function() {
 			  zoom: 15
 			});
 
-			console.log(self.cityExists);
 			var request = {
 			    location: loc,
 			    radius: '500',
@@ -119,17 +113,21 @@ var ViewModelMapApp = function() {
 			});
 			}).error(function() {
 				console.log("error");
-				self.cityExists = false;
+				self.cityExists(false);
 		});
 		console.log(lat, lng);
-		// Create a map object and specify the DOM element for display.
+		
+		//Add an h2 DOM element
+		self.city = self.city.toLowerCase();
+		var cityRefinded = self.city.charAt(0).toUpperCase() + self.city.slice(1);
+		$('#restaurantHeader').text('Restaurants in downtown ' + cityRefinded + '');
 		
 	};	
 
 	//search through initialRestaurants function using the updated searchStr
 
 
-	this.search = function() {
+	self.search = function() {
 		//Hide all markers from map
 		self.setMapOnAll(null);
 		var str, strRestaurant;
@@ -165,9 +163,55 @@ var ViewModelMapApp = function() {
 		}
 	}
 	
-	//google.maps.event.addDomListener(window, 'load', this.initMap);
+	self.infoFunction = function(restaurant) {
+		$('.modal-title').text("Information and review about " + restaurant.name + "");
+		var result = self.YelpRequest(restaurant.name);
+		console.log("done");
+	}
 
-	//display streetview thumbnail when user hovers on marker
+	self.YelpRequest = function(name) {
+		function nonce_generate() {
+			return (Math.floor(Math.random() * 1e12).toString());
+		};
+
+		var yelp_url = 'https://api.yelp.com/v2/business?';
+
+	    var parameters = {
+	   		term: name,
+	    	location: self.city,
+	    	oauth_consumer_key: 'wpu8WCsLsM8HWhWKBevgoQ',
+	    	oauth_token: 'zFrQV7GKkgtDmbSMrMMFOZ5xyPVB_Ps8',
+	    	oauth_nonce: nonce_generate(),
+	    	oauth_timestamp: Math.floor(Date.now()/1000),
+	    	oauth_signature_method: 'HMAC-SHA1',
+	    	callback: 'cb'             // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
+	  	};
+		  
+		var consumer_secret = 'trm_jAkT2XCvzDDgxPo2Uuj5vvg',
+		    token_secret = 'y8W6EkCA9o-DR4t5m14RZ30ePlg';
+		      
+		var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, consumer_secret, token_secret);
+		  parameters.oauth_signature = encodedSignature;
+
+		var settings = {
+		    url: yelp_url,
+		    data: parameters,
+		    cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
+		    dataType: 'jsonp',
+		    jsonpCallback: 'cb',
+		    success: function(results) {
+		      // Do stuff with results
+		      console.log("SUCCCESS! %o", results);
+		      return results;
+		    },
+		    error: function(error) {
+		      // Do stuff on fail
+		      console.log(error);
+		    }
+		};
+		// Send AJAX query via jQuery library.
+		$.ajax(settings);
+	}
 
 }
 
