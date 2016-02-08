@@ -1,16 +1,37 @@
+body {
+	font-family: 'Asap', sans-serif;
+}
 
+header {
+	color: white;
+	background-color: #3B3B3B;
+}
 
+.headerInfo {
+	margin-top: 50px;
 
+	text-align: center;
+}
 
-
-
-
+.searchBar {
+	background-color: rgba(128, 189, 181, 0.9);
+	position: absolute;
+	z-index: 0;
+}
 
 ul {
 	list-style: none;
 }
 
+a {
+	color: black;
+	text-decoration: underline;
+}
 
+a:hover {
+	font-weight: bold;
+	color: black;
+}
 
 .restaurant {
 	font-weight: bold;
@@ -25,10 +46,10 @@ span {
 
 
 .map {
-	height: 800px;
-	padding: 20px;
-	margin-bottom: 100px;
-	margin-top: 150px;
+	height: 1000px;
+	position: relative;
+	z-index: -1;
+	width: 100%;
 }
 
 .disabled {

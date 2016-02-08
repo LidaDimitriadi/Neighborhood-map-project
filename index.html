@@ -5,40 +5,49 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+		<link href='https://fonts.googleapis.com/css?family=Asap:400,700' rel='stylesheet' type='text/css'>
 		<link rel="stylesheet" type="text/css" href="css/style.css">
 	</head>
 	<body>
 		<div class="container-fluid">
-			<header class="row"><h1 class="text-center col-md-12 col-xs-12">My Neighborhood map App</h1></header>
+			<header class="row">
+				<h1 class="text-center col-md-12 col-xs-12">My Neighborhood map App</h1>
+				<p class="headerInfo">Pick a city and search for restaurants<br>
+				Hover on markers to get a street view<br>
+				Click on restaurant's name on the displayed list to view Yelp reviews and information<br>
+				(if the requested restaurant is registered in Yelp)</p>
+			</header>
 			<section class="row">
-				<h2 class="col-md-12 col-xs-12">Type a city to search restaurants</h2>
-				<div class="col-md-4 col-xs-12">
-					<div class="searchBar">
-						<form data-bind="submit: initMap">
-					       <label for="city">City: </label><input type="text" id="city" class="form-control" value="">
-					       <button class="btn btn-default">Submit</button>
-					    </form>
-					</div>
-					<div class="searchBar" data-bind="css: {disabled:  cityExists() == false }">
-						<h2 id="restaurantHeader" class="col-md-12 col-xs-12"></h2>
-						<form>
-							<label for="search">Search restaurants</label>
-							<input id="search" class="form-control" placeholder="Search" data-bind="textInput: searchStr, 
-							event: { 
-						        keyup: function(event) { search(); }
-						    }"/>
-						</form>
-						<ul data-bind="foreach: RestaurantsList">
-							<li class="restaurant">
-							Name: <a href="#" data-toggle="modal" data-target="#myModal"> <span data-bind="text: name, click: $parent.infoFunction"></span></a><br>
-								Rating: <span data-bind="text: rating"></span><br>
-								Address: <span data-bind="text: address"></span><br>
-							</li>
-						</ul>
-					</div>
+				<div id="map" class="col-md-12 col-xs-12 map"></div>
+				<div class="searchBar col-md-4 col-xs-12">
+					<h2>Type a city to search restaurants</h2>
+					<div>
+						<div>
+							<form data-bind="submit: initMap">
+						       <label for="city">City: </label><input type="text" id="city" class="form-control" value="">
+						       <button class="btn btn-default">Submit</button>
+						    </form>
+						</div>
+						<div data-bind="css: {disabled:  cityExists() == false }">
+							<h2 id="restaurantHeader"></h2>
+							<form>
+								<label for="search">Search restaurants</label>
+								<input id="search" class="form-control" placeholder="Search" data-bind="textInput: searchStr, 
+								event: { 
+							        keyup: function(event) { search(); }
+							    }"/>
+							</form>
+							<ul data-bind="foreach: RestaurantsList">
+								<li class="restaurant">
+								Name: <a href="#" data-toggle="modal" data-target="#myModal"> <span data-bind="text: name, click: $parent.infoFunction"></span></a><br>
+									Rating: <span data-bind="text: rating"></span><br>
+									Address: <span data-bind="text: address"></span><br>
+								</li>
+							</ul>
+						</div>
+					</div>	
 				</div>	
-				<div class="map col-md-8 col-xs-12" id="map">
-
+				<div class="col-md-8 col-xs-12">
 				</div>
 
 			</section>
@@ -53,8 +62,7 @@
 			        <button type="button" class="close" data-dismiss="modal">&times;</button>
 			        <h4 class="modal-title"></h4>
 			      </div>
-			      <div class="modal-body">
-			        <p></p>
+			      <div class="modal-body" data-bind="html: modal">
 			      </div>
 			      <div class="modal-footer">
 			        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

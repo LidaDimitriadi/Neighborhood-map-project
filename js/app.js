@@ -20,6 +20,7 @@ var ViewModelMapApp = function() {
 	self.markers = [];
 	self.cityExists = ko.observable(false);
 	self.city = "";
+	self.modal = ko.observable("");
 	self.setMapOnAll = function(map) {
 	  for (var i = 0; i < self.markers.length; i++) {
 	    self.markers[i].setMap(map);
@@ -115,7 +116,6 @@ var ViewModelMapApp = function() {
 				console.log("error");
 				self.cityExists(false);
 		});
-		console.log(lat, lng);
 		
 		//Add an h2 DOM element
 		self.city = self.city.toLowerCase();
@@ -165,52 +165,72 @@ var ViewModelMapApp = function() {
 	
 	self.infoFunction = function(restaurant) {
 		$('.modal-title').text("Information and review about " + restaurant.name + "");
-		var result = self.YelpRequest(restaurant.name);
-		console.log("done");
+		self.YelpRequest(restaurant.name, restaurant.address);
 	}
 
-	self.YelpRequest = function(name) {
+	self.YelpRequest = function(name, address) {
 		function nonce_generate() {
 			return (Math.floor(Math.random() * 1e12).toString());
 		};
 
-		var yelp_url = 'https://api.yelp.com/v2/business?';
+		var yelp_url = 'https://api.yelp.com/v2/search?';
 
 	    var parameters = {
-	   		term: name,
-	    	location: self.city,
+	   		term: "restaurant",
+	    	location: address,
+	    	radius_filter: "0.1",
+	    	limit: 1,
 	    	oauth_consumer_key: 'wpu8WCsLsM8HWhWKBevgoQ',
 	    	oauth_token: 'zFrQV7GKkgtDmbSMrMMFOZ5xyPVB_Ps8',
 	    	oauth_nonce: nonce_generate(),
 	    	oauth_timestamp: Math.floor(Date.now()/1000),
 	    	oauth_signature_method: 'HMAC-SHA1',
+	    	oauth_version: '1.0',
 	    	callback: 'cb'             // This is crucial to include for jsonp implementation in AJAX or else the oauth-signature will be wrong.
 	  	};
 		  
 		var consumer_secret = 'trm_jAkT2XCvzDDgxPo2Uuj5vvg',
 		    token_secret = 'y8W6EkCA9o-DR4t5m14RZ30ePlg';
 		      
-		var encodedSignature = oauthSignature.generate('GET',yelp_url, parameters, consumer_secret, token_secret);
+		var encodedSignature = oauthSignature.generate('GET', yelp_url, parameters, consumer_secret, token_secret);
 		  parameters.oauth_signature = encodedSignature;
 
-		var settings = {
+		// Send AJAX query via jQuery library.
+		$.ajax({
 		    url: yelp_url,
 		    data: parameters,
 		    cache: true,                // This is crucial to include as well to prevent jQuery from adding on a cache-buster parameter "_=23489489749837", invalidating our oauth-signature
 		    dataType: 'jsonp',
-		    jsonpCallback: 'cb',
+		    //jsonpCallback: 'cb',
 		    success: function(results) {
 		      // Do stuff with results
+		      //See if the requested restaurant exists in Yelp database
+		      var location = results.businesses[0].location.address[0];
+		      var locationArray, categories;
 		      console.log("SUCCCESS! %o", results);
-		      return results;
+		      locationArray = location.split(" ");
+		      location = locationArray[0] + " " + locationArray[1];
+		      if (address.indexOf(location) >= 0) {
+		      	categories = results.businesses[0].categories[0][1];
+		      	self.modal('<h3>' + name + '</h3><p>Category: ' + categories + '</p>'
+		      				+ '<img src="' + results.businesses[0].rating_img_url + '"><br>'
+		      				+ '<img src="' + results.businesses[0].image_url + '"><br><br>'
+		      				+ '<p>Visit the restaurants Yelp ' + '<a href="' + results.businesses[0].url + '">page</a><br>' 
+		      				+ '<p>And a review snippet:<br><br> "' + results.businesses[0].snippet_text + '"</p>');
+		      }
+
+		      else {
+		      	self.modal("<p>Sorry, Yelp couldn't find the requested restaurant!</p>");
+		      }
+		      
 		    },
 		    error: function(error) {
 		      // Do stuff on fail
-		      console.log(error);
+		      console.log("error");
+		      self.modal("<p>Sorry, Yelp doesn't support your city!</p>");
 		    }
-		};
-		// Send AJAX query via jQuery library.
-		$.ajax(settings);
+		});
+
 	}
 
 }
