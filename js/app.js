@@ -55,7 +55,8 @@ var ViewModelMapApp = function() {
 			var request = {
 			    location: loc,
 			    radius: '500',
-			    types: ['restaurant']
+			    types: ['restaurant'],
+			    maxprice: 1
 			  };
 
 			// Create the PlaceService and send the request.

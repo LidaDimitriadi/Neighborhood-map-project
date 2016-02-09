@@ -19,35 +19,33 @@
 			</header>
 			<section class="row">
 				<div id="map" class="col-md-12 col-xs-12 map"></div>
-				<div class="searchBar col-md-4 col-xs-12">
+				<div class="searchBar col-md-4 col-xs-6">
 					<h2>Type a city to search restaurants</h2>
 					<div>
-						<div>
-							<form data-bind="submit: initMap">
-						       <label for="city">City: </label><input type="text" id="city" class="form-control" value="">
-						       <button class="btn btn-default">Submit</button>
-						    </form>
-						</div>
-						<div data-bind="css: {disabled:  cityExists() == false }">
-							<h2 id="restaurantHeader"></h2>
-							<form>
-								<label for="search">Search restaurants</label>
-								<input id="search" class="form-control" placeholder="Search" data-bind="textInput: searchStr, 
-								event: { 
-							        keyup: function(event) { search(); }
-							    }"/>
-							</form>
-							<ul data-bind="foreach: RestaurantsList">
-								<li class="restaurant">
-								Name: <a href="#" data-toggle="modal" data-target="#myModal"> <span data-bind="text: name, click: $parent.infoFunction"></span></a><br>
-									Rating: <span data-bind="text: rating"></span><br>
-									Address: <span data-bind="text: address"></span><br>
-								</li>
-							</ul>
-						</div>
-					</div>	
+						<form data-bind="submit: initMap">
+					       <label for="city">City: </label><input type="text" id="city" class="form-control" value="">
+					       <button class="btn btn-default">Submit</button>
+					    </form>
+					</div>
+					<div data-bind="css: {disabled:  cityExists() == false }">
+						<h2 id="restaurantHeader"></h2>
+						<form>
+							<label for="search">Search restaurants</label>
+							<input id="search" class="form-control" placeholder="Search" data-bind="textInput: searchStr, 
+							event: { 
+						        keyup: function(event) { search(); }
+						    }"/>
+						</form>
+						<ul data-bind="foreach: RestaurantsList">
+							<li class="restaurant">
+							Name: <a href="#" data-toggle="modal" data-target="#myModal"> <span data-bind="text: name, click: $parent.infoFunction"></span></a><br>
+								Rating: <span data-bind="text: rating"></span><br>
+								Address: <span data-bind="text: address"></span><br>
+							</li>
+						</ul>
+					</div>
 				</div>	
-				<div class="col-md-8 col-xs-12">
+				<div class="col-md-8 col-xs-6">
 				</div>
 
 			</section>
@@ -73,7 +71,10 @@
 			</div>
 
 
-			<footer class="row"><p class="text-center col-md-12 col-xs-12">Lida Dimitriadi &copy Copywrite 2016</p></footer>
+			<footer class="row">
+				<p class="text-center col-md-12 col-xs-12">Neighborhood map Application</p>
+				<p class="text-center col-md-12 col-xs-12">Lida Dimitriadi &copy Copywrite 2016</p>
+			</footer>
 		</div>
 		<script src="bower_components/jquery/dist/jquery.min.js"></script>
 		<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
