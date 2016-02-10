@@ -209,21 +209,25 @@ var ViewModelMapApp = function() {
 		      var location = results.businesses[0].location.address[0];
 		      var locationArray, categories;
 		      console.log("SUCCCESS! %o", results);
-		      locationArray = location.split(" ");
-		      location = locationArray[0] + " " + locationArray[1];
-		      if (address.indexOf(location) >= 0) {
-		      	categories = results.businesses[0].categories[0][1];
-		      	self.modal('<h3>' + name + '</h3><p>Category: ' + categories + '</p>'
-		      				+ '<img src="' + results.businesses[0].rating_img_url + '"><br>'
-		      				+ '<img src="' + results.businesses[0].image_url + '"><br><br>'
-		      				+ '<p>Visit the restaurants Yelp ' + '<a href="' + results.businesses[0].url + '">page</a><br>' 
-		      				+ '<p>And a review snippet:<br><br> "' + results.businesses[0].snippet_text + '"</p>');
-		      }
-
-		      else {
+		      if (location == undefined) {
 		      	self.modal("<p>Sorry, Yelp couldn't find the requested restaurant!</p>");
 		      }
-		      
+		      else {
+			      locationArray = location.split(" ");
+			      location = locationArray[0] + " " + locationArray[1];
+			      if (address.indexOf(location) >= 0) {
+			      	categories = results.businesses[0].categories[0][1];
+			      	self.modal('<h3>' + name + '</h3><p>Category: ' + categories + '</p>'
+			      				+ '<img src="' + results.businesses[0].rating_img_url + '"><br>'
+			      				+ '<img src="' + results.businesses[0].image_url + '"><br><br>'
+			      				+ "<p>Visit the restaurant's Yelp " + '<a href="' + results.businesses[0].url + '">page</a><br>' 
+			      				+ '<p>And a review snippet:<br><br> "' + results.businesses[0].snippet_text + '"</p>');
+			      }
+
+			      else {
+			      	self.modal("<p>Sorry, Yelp couldn't find the requested restaurant!</p>");
+			      }
+		      }  
 		    },
 		    error: function(error) {
 		      // Do stuff on fail
